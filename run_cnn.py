@@ -167,12 +167,9 @@ def test(x_test, y_test):
 
     # 评估
     print("Precision, Recall and F1-Score...")
-    # print(metrics.classification_report(y_true=y_test,y_pred=y_pred,target_names=categories))
+    print(metrics.classification_report(y_true=y_test,y_pred=y_pred,target_names=categories))
 
     # 混淆矩阵
-    print("Confusion Matrix...")
-    cm = metrics.confusion_matrix(y_test, y_pred)
-    print(cm)
 
     time_dif = get_time_dif(start_time)
     print("Time usage:", time_dif)
