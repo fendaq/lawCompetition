@@ -85,24 +85,18 @@ def batch_iter(x, y, batch_size, shuffle=True):
 def get_data_with_vocab(data_dir, words_to_id, cat_to_id, vocab_length):
     import keras
     import random
+    print("get data from {0}...".format(data_dir))
     contents, labels = read_data(data_dir)
     data_id, label_id, all_data = [], [], []
     for i in range(len(contents)):
-        all_data.append(contents[i]+','+labels[i])
-    data_size = len(all_data)
-    random.shuffle(all_data)
-    contents, labels = [], []
-    for _, data in enumerate(all_data):
-        content, label = str(data).strip().split(',')
-        contents.append(content)
-        labels.append(label)
+        all_data.append(contents[i]+'split'+str(labels[i]))
     for i in range(len(contents)):
         data_id.append([words_to_id[x]
                         for x in contents[i] if x in words_to_id])
         label_id.append(labels[i])
     x_data = keras.preprocessing.sequence.pad_sequences(
         data_id, int(vocab_length), dtype='float32')
-    y_data = keras.utils.to_categorical(label_id)
+    y_data = keras.utils.to_categorical(label_id,num_classes=301)
     return x_data, y_data, all_data
 
 

@@ -6,8 +6,8 @@ class TCNNConfig(object):
     """CNN配置参数"""
     vocab_dim = 400
     embedding_size = 128  # 词向量维度
-    seq_length = 300  # 序列长度
-    num_classes = 5  # 类别数
+    seq_length = 301  # 序列长度
+    num_classes = 301  # 类别数
     num_filters = 256  # 卷积核数目
     filter_size = [2, 3, 4, 5]  # 卷积核尺寸
     vocab_size = 5000  # 词汇表大小

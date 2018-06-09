@@ -13,13 +13,13 @@ from sklearn import metrics
 from prepareData import read_vocab, batch_iter, get_data_with_vocab, build_vocab, read_catagory
 import cnn_model
 
-base_dir = 'D:/cail/good'
+base_dir = './good'
 train_dir = os.path.join(base_dir, 'data_train.json')
 test_dir = os.path.join(base_dir, 'data_test.json')
 valid_dir = os.path.join(base_dir, 'data_valid.json')
-vocab_dir = os.path.join(base_dir, 'vocab/data_model.txt')
+vocab_dir = os.path.join(base_dir, 'vocab.txt')
 
-save_dir = 'D:/checkpoints/textcnn'
+save_dir = './checkpoints'
 save_path = os.path.join(save_dir, 'best_validation')  # 最佳验证结果保存路径
 
 
@@ -217,7 +217,6 @@ def final_test(x_test, y_test, x_text):
 if __name__ == '__main__':
     #    if len(sys.argv) != 2 or sys.argv[1] not in ['train', 'test']:
     #        raise ValueError("""usage: python run_cnn.py [train / test]""")
-
     print('Configuring CNN model...')
     config = cnn_model.TCNNConfig()
     if not os.path.exists(vocab_dir):  # 如果不存在词汇表，重建
@@ -227,17 +226,16 @@ if __name__ == '__main__':
     words, word_to_id = read_vocab(vocab_dir)
     config.vocab_size = len(words)
 
-    x_train, y_train, _ = get_data_with_vocab(
+    x_train_, y_train_, _ = get_data_with_vocab(
         train_dir, word_to_id, cat_to_id, config.seq_length)
-    x_val, y_val, _ = get_data_with_vocab(
+    x_val_, y_val_, _ = get_data_with_vocab(
         valid_dir, word_to_id, cat_to_id, config.seq_length)
-    x_test, y_test, x_text = get_data_with_vocab(
+    x_test_, y_test_, _ = get_data_with_vocab(
         test_dir, word_to_id, cat_to_id, config.seq_length)
-    config.num_classes=len(y_train[0])
     model = cnn_model.CharLevelCNN(config)
 #    if sys.argv[1] == 'train':
-    # model =cnnModel.(config,128,2,256,5)
-    train(x_train, y_train, x_val, y_val)
+    #model =cnnModel.(config,128,2,256,5)
+    train(x_train_, y_train_, x_val_, y_val_)
 #    else:
-    test(x_test, y_test)
+    test(x_test_, y_test_)
 #    final_test(x_test,y_test,x_text)
