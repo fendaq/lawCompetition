@@ -1,5 +1,4 @@
 import tensorflow as tf
-import pickle
 
 
 class TCNNConfig(object):
@@ -38,7 +37,6 @@ class CharLevelCNN(object):
         self.l2_loss = 0
         self.l2_lambda = 0.2
         self.char_level_cnn()
-    
 
     def char_level_cnn(self):
         """CNN模型"""
