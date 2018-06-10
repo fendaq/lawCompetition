@@ -5,7 +5,7 @@ def read_data(file_name, target_case="term_of_imprisonment"):
         for line in f:
             content = json.loads(line)["fact"]
             label = json.loads(line)["meta"][target_case]
-            if target_case=="term_of_imprisonment":
+            if target_case == "term_of_imprisonment":
                 if label["death_penalty"]:
                     label = -2
                 elif label["life_imprisonment"]:
@@ -13,8 +13,8 @@ def read_data(file_name, target_case="term_of_imprisonment"):
                 else:
                     label = label["imprisonment"]
             else:
-                temp=lable[0].replace('[','')
-                label=temp.replace(']','')
+                temp = str(label[0]).replace('[', '')
+                label = temp.replace(']', '')
             if content:
                 contents.append(content)
                 labels.append(label)
@@ -86,24 +86,22 @@ def batch_iter(x, y, batch_size, shuffle=True):
         yield x_shuffle[start_index:end_index], y_shuffle[start_index:end_index]
 
 
-def get_data_with_vocab(data_dir, words_to_id, cat_to_id, vocab_length,target_case='term_of_imprisonment'):
+def get_data_with_vocab(data_dir, words_to_id, cat_to_id, vocab_length, target_case='term_of_imprisonment'):
     import keras
     import random
     print("get data from {0}...".format(data_dir))
-    contents, labels = read_data(data_dir,target_case)
+    contents, labels = read_data(data_dir, target_case)
     data_id, label_id, all_data = [], [], []
     for i in range(len(contents)):
         all_data.append(contents[i]+'split'+str(labels[i]))
     for i in range(len(contents)):
         data_id.append([words_to_id[x]
                         for x in contents[i] if x in words_to_id])
-        if target_case=='accusation':
-            for i in range(len(labels)):
-                labels[i]=cat_to_id(labels[i])
-        label_id.append(labels[i])
+        if target_case != 'term_of_imprisonment':
+            label_id.append(cat_to_id[labels[i]])
     x_data = keras.preprocessing.sequence.pad_sequences(
         data_id, int(vocab_length), dtype='float32')
-    y_data = keras.utils.to_categorical(label_id,num_classes=301)
+    y_data = keras.utils.to_categorical(label_id, num_classes=301)
     return x_data, y_data, all_data
 
 
@@ -112,12 +110,15 @@ def to_words(content, words):
 
 
 def read_catagory(cat_dir):
-    cat_to_id={}
-    with open(file=cat_dir,mode='r',encoding='utf8') as cat_file:
-        index=1
+    cat_to_id = {}
+    catagories = []
+    with open(file=cat_dir, mode='r', encoding='utf8') as cat_file:
+        index = 1
         for line in cat_file.readlines():
-            catagories=line.strip()
-            cat_to_id[catagories]=index
+            catagory = line.strip()
+            catagories.append(catagory)
+            cat_to_id[catagory] = index
+            index += 1
     return catagories, cat_to_id
 
 
