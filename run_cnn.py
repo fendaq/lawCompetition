@@ -18,7 +18,7 @@ train_dir = os.path.join(base_dir, 'data_train.json')
 test_dir = os.path.join(base_dir, 'data_test.json')
 valid_dir = os.path.join(base_dir, 'data_valid.json')
 vocab_dir = os.path.join(base_dir, 'vocab.txt')
-target_name = 'relevant_articles'
+target_name = 'term_of_imprisonment'
 if target_name == 'accusation':
     cat_dir = os.path.join(base_dir, 'accu.txt')
 else:
@@ -184,8 +184,6 @@ def test(x_test, y_test):
 
 
 if __name__ == '__main__':
-    #    if len(sys.argv) != 2 or sys.argv[1] not in ['train', 'test']:
-    #        raise ValueError("""usage: python run_cnn.py [train / test]""")
     print('Configuring CNN model...')
     config = cnn_model.TCNNConfig()
     if not os.path.exists(vocab_dir):  # 如果不存在词汇表，重建
@@ -202,9 +200,5 @@ if __name__ == '__main__':
     x_test_, y_test_, _ = get_data_with_vocab(
         test_dir, word_to_id, cat_to_id, config.seq_length, target_case=target_name)
     model = cnn_model.CharLevelCNN(config)
-#    if sys.argv[1] == 'train':
-    # model =cnnModel.(config,128,2,256,5)
     train(x_train_, y_train_, x_val_, y_val_)
-#    else:
     test(x_test_, y_test_)
-#    final_test(x_test,y_test,x_text)

@@ -6,8 +6,8 @@ class TCNNConfig(object):
     """CNN配置参数"""
     vocab_dim = 400
     embedding_size = 128  # 词向量维度
-    seq_length = 1000  # 序列长度
-    num_classes = 301  # 类别数
+    seq_length = 500  # 序列长度
+    num_classes = 303  # 类别数
     num_filters = 256  # 卷积核数目
     filter_size = [2, 3, 4, 5]  # 卷积核尺寸
     vocab_size = 4896  # 词汇表大小
@@ -16,12 +16,12 @@ class TCNNConfig(object):
 
     learning_rate = 1e-5  # 学习率
 
-    batch_size = 128  # 每批训练大小
+    batch_size = 64  # 每批训练大小
     num_epochs = 10000  # 总迭代轮次
     kernel_size = 5
     print_per_batch = 100  # 每多少轮输出一次结果
     save_per_batch = 10  # 每多少轮存入tensorboard
-    l2_lambda = 0.1
+    l2_lambda = 0
 
 
 class CharLevelCNN(object):

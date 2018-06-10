@@ -88,9 +88,9 @@ def batch_iter(x, y, batch_size, shuffle=True):
 
 def get_data_with_vocab(data_dir, words_to_id, cat_to_id, vocab_length, target_case='term_of_imprisonment'):
     import keras
-    import random
     print("get data from {0}...".format(data_dir))
     contents, labels = read_data(data_dir, target_case)
+    labels[0]=-2
     data_id, label_id, all_data = [], [], []
     for i in range(len(contents)):
         all_data.append(contents[i]+'split'+str(labels[i]))
@@ -99,9 +99,11 @@ def get_data_with_vocab(data_dir, words_to_id, cat_to_id, vocab_length, target_c
                         for x in contents[i] if x in words_to_id])
         if target_case != 'term_of_imprisonment':
             label_id.append(cat_to_id[labels[i]])
+        else:
+            label_id.append(labels[i]+2)
     x_data = keras.preprocessing.sequence.pad_sequences(
         data_id, int(vocab_length), dtype='float32')
-    y_data = keras.utils.to_categorical(label_id, num_classes=301)
+    y_data = keras.utils.to_categorical(label_id, num_classes=303)
     return x_data, y_data, all_data
 
 

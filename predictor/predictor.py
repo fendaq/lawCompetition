@@ -56,8 +56,8 @@ class Predictor():
 
         result = []
         for i in range(len(content)):
-            temp = {"accusation": [int(accu_result[i]+1)], "articles":
-                    [int(relevant_result[i]+1)], "imprisonment": int(year_result[i]-2)}
+            temp = {"accusation": [int(accu_result[i])], "articles":
+                    [int(relevant_result[i])], "imprisonment": int(year_result[i]-2)}
             result.append(temp)
         return result
 
