@@ -54,11 +54,11 @@ class Predictor():
             year_result = session.run(self.model.y_pred, feed_dict=feed_dict)
 
 
-        result = {}
+        result = []
         for i in range(len(content)):
-            temp = {"accusation": accu_result[i]+1, "relevant_articles":
-                    relevant_result[i]+1, "term_of_imprisonment": year_result[i]-2}
-            result[i]=temp
+            temp = {"accusation": [int(accu_result[i]+1)], "articles":
+                    [int(relevant_result[i]+1)], "imprisonment": int(year_result[i]-2)}
+            result.append(temp)
         return result
 
     def read_vocab(self, vocab_dir):
