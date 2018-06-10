@@ -5,12 +5,16 @@ def read_data(file_name, target_case="term_of_imprisonment"):
         for line in f:
             content = json.loads(line)["fact"]
             label = json.loads(line)["meta"][target_case]
-            if label["death_penalty"]:
-                label = -2
-            elif label["life_imprisonment"]:
-                label = -1
+            if target_case=="term_of_imprisonment":
+                if label["death_penalty"]:
+                    label = -2
+                elif label["life_imprisonment"]:
+                    label = -1
+                else:
+                    label = label["imprisonment"]
             else:
-                label = label["imprisonment"]
+                temp=lable[0].replace('[','')
+                label=temp.replace(']','')
             if content:
                 contents.append(content)
                 labels.append(label)
@@ -82,17 +86,20 @@ def batch_iter(x, y, batch_size, shuffle=True):
         yield x_shuffle[start_index:end_index], y_shuffle[start_index:end_index]
 
 
-def get_data_with_vocab(data_dir, words_to_id, cat_to_id, vocab_length):
+def get_data_with_vocab(data_dir, words_to_id, cat_to_id, vocab_length,target_case='term_of_imprisonment'):
     import keras
     import random
     print("get data from {0}...".format(data_dir))
-    contents, labels = read_data(data_dir)
+    contents, labels = read_data(data_dir,target_case)
     data_id, label_id, all_data = [], [], []
     for i in range(len(contents)):
         all_data.append(contents[i]+'split'+str(labels[i]))
     for i in range(len(contents)):
         data_id.append([words_to_id[x]
                         for x in contents[i] if x in words_to_id])
+        if target_case=='accusation':
+            for i in range(len(labels)):
+                labels[i]=cat_to_id(labels[i])
         label_id.append(labels[i])
     x_data = keras.preprocessing.sequence.pad_sequences(
         data_id, int(vocab_length), dtype='float32')
@@ -104,10 +111,13 @@ def to_words(content, words):
     return ' '.join(words[x] for x in content)
 
 
-def read_catagory():
-    catagories = ['1', '2', '3', '4', '5', '6', '7', '8', '9']
-    catagories = [x for x in catagories]
-    cat_to_id = dict(zip(catagories, range(len(catagories))))
+def read_catagory(cat_dir):
+    cat_to_id={}
+    with open(file=cat_dir,mode='r',encoding='utf8') as cat_file:
+        index=1
+        for line in cat_file.readlines():
+            catagories=line.strip()
+            cat_to_id[catagories]=index
     return catagories, cat_to_id
 
 

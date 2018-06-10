@@ -18,6 +18,7 @@ train_dir = os.path.join(base_dir, 'data_train.json')
 test_dir = os.path.join(base_dir, 'data_test.json')
 valid_dir = os.path.join(base_dir, 'data_valid.json')
 vocab_dir = os.path.join(base_dir, 'vocab.txt')
+cat_dir=os.path.join(base_dir,'accu.txt')
 
 save_dir = './checkpoints'
 save_path = os.path.join(save_dir, 'best_validation')  # 最佳验证结果保存路径
@@ -219,7 +220,7 @@ if __name__ == '__main__':
     if not os.path.exists(vocab_dir):  # 如果不存在词汇表，重建
         build_vocab(train_dir, valid_dir, test_dir,
                     vocab_dir, config.vocab_size, 10)
-    categories, cat_to_id = read_catagory()
+    categories, cat_to_id = read_catagory(cat_dir)
     words, word_to_id = read_vocab(vocab_dir)
     config.vocab_size = len(words)
 
