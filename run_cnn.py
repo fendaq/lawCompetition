@@ -18,10 +18,15 @@ train_dir = os.path.join(base_dir, 'data_train.json')
 test_dir = os.path.join(base_dir, 'data_test.json')
 valid_dir = os.path.join(base_dir, 'data_valid.json')
 vocab_dir = os.path.join(base_dir, 'vocab.txt')
-cat_dir=os.path.join(base_dir,'accu.txt')
+target_name = 'relevant_articles'
+if target_name == 'accusation':
+    cat_dir = os.path.join(base_dir, 'accu.txt')
+else:
+    cat_dir = os.path.join(base_dir, 'law.txt')
+#任务类型有三种，accusation,term_of_imprisonment,relevant_articles
 
-save_dir = './checkpoints'
-save_path = os.path.join(save_dir, 'best_validation')  # 最佳验证结果保存路径
+save_dir = './model/'+target_name
+save_path = os.path.join(save_dir, 'best_valid')  # 最佳验证结果保存路径
 
 
 def get_time_dif(start_time):
@@ -168,7 +173,8 @@ def test(x_test, y_test):
 
     # 评估
     print("Precision, Recall and F1-Score...")
-    print(metrics.classification_report(y_true=y_test,y_pred=y_pred,target_names=categories))
+    print(metrics.classification_report(
+        y_true=y_test, y_pred=y_pred, target_names=categories))
 
     # 混淆矩阵
 
@@ -176,7 +182,7 @@ def test(x_test, y_test):
     print("Time usage:", time_dif)
 
 
-def final_test(x_test, y_test, x_text):
+def final_test(x_test, y_test):
     print("Loading test data...")
     session = tf.Session()
     session.run(tf.global_variables_initializer())
@@ -225,14 +231,14 @@ if __name__ == '__main__':
     config.vocab_size = len(words)
 
     x_train_, y_train_, _ = get_data_with_vocab(
-        train_dir, word_to_id, cat_to_id, config.seq_length)
+        train_dir, word_to_id, cat_to_id, config.seq_length, target_case=target_name)
     x_val_, y_val_, _ = get_data_with_vocab(
-        valid_dir, word_to_id, cat_to_id, config.seq_length)
+        valid_dir, word_to_id, cat_to_id, config.seq_length, target_case=target_name)
     x_test_, y_test_, _ = get_data_with_vocab(
-        test_dir, word_to_id, cat_to_id, config.seq_length)
+        test_dir, word_to_id, cat_to_id, config.seq_length, target_case=target_name)
     model = cnn_model.CharLevelCNN(config)
 #    if sys.argv[1] == 'train':
-    #model =cnnModel.(config,128,2,256,5)
+    # model =cnnModel.(config,128,2,256,5)
     train(x_train_, y_train_, x_val_, y_val_)
 #    else:
     test(x_test_, y_test_)

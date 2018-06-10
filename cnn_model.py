@@ -16,7 +16,7 @@ class TCNNConfig(object):
 
     learning_rate = 1e-5  # 学习率
 
-    batch_size = 64  # 每批训练大小
+    batch_size = 128  # 每批训练大小
     num_epochs = 10000  # 总迭代轮次
     kernel_size = 5
     print_per_batch = 100  # 每多少轮输出一次结果
@@ -70,7 +70,7 @@ class CharLevelCNN(object):
 
         with tf.name_scope("optimize"):
             # 损失函数，交叉熵
-            cross_entropy = tf.nn.softmax_cross_entropy_with_logits(
+            cross_entropy = tf.nn.softmax_cross_entropy_with_logits_v2(
                 logits=self.logits, labels=self.y)
             self.loss = tf.reduce_mean(
                 cross_entropy)+self.l2_loss*self.l2_lambda
