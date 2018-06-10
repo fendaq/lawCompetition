@@ -1,5 +1,5 @@
 import os
-import cnn_model
+from .cnn_model import TCNNConfig, CharLevelCNN
 import tensorflow as tf
 import numpy as np
 import keras
@@ -7,9 +7,9 @@ import keras
 
 class Predictor():
     def __init__(self):
-        self.config = cnn_model.TCNNConfig()
+        self.config = TCNNConfig()
         self.batch_size = self.config.batch_size
-        self.model = cnn_model.CharLevelCNN(self.config)
+        self.model = CharLevelCNN(self.config)
         self.model_dir = os.path.dirname(__file__)+'/model/'
         self.accusation_model = self.model_dir+'accusation/best_valid'
         self.relevant_model = self.model_dir+'relevant_articles/best_valid'
@@ -39,7 +39,7 @@ class Predictor():
             session.run(tf.global_variables_initializer())
             saver = tf.train.Saver()
             saver.restore(sess=session, save_path=self.relevant_model)
-            year_result = session.run(self.model.y_pred, feed_dict=feed_dict)
+            relevant_result = session.run(self.model.y_pred, feed_dict=feed_dict)
 
         with tf.Session() as session:
             session.run(tf.global_variables_initializer())

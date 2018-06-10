@@ -94,7 +94,7 @@ def train(x_train, y_train, x_val, y_val):
     total_batch = 0  # 总批次
     best_acc_val = 0.0  # 最佳验证集准确率
     last_improved = 0  # 记录上一次提升批次
-    require_improvement = 3000  # 如果超过3000轮未提升，提前结束训练
+    require_improvement = 10000  # 如果超过3000轮未提升，提前结束训练
 
     flag = False
     for _ in range(config.num_epochs):
@@ -181,41 +181,6 @@ def test(x_test, y_test):
     time_dif = get_time_dif(start_time)
     print("Time usage:", time_dif)
 
-
-def final_test(x_test, y_test):
-    print("Loading test data...")
-    session = tf.Session()
-    session.run(tf.global_variables_initializer())
-    saver = tf.train.Saver()
-    saver.restore(sess=session, save_path=save_path)  # 读取保存的模型
-
-#    print('Testing...')
-#    loss_test, acc_test = evaluate(session, x_test, y_test)
-#   msg = 'Test Loss: {0:>6.2}, Test Acc: {1:>7.2%}'
-#    print(msg.format(loss_test, acc_test))
-
-    batch_size = 128
-    data_len = len(x_test)
-    num_batch = int((data_len - 1) / batch_size) + 1
-
-    y_test = np.argmax(y_test, 1)
-    y_pred = np.zeros(shape=len(x_test), dtype=np.int32)  # 保存预测结果
-    for i in range(num_batch):  # 逐批次处理
-        start_id = i * batch_size
-        end_id = min((i + 1) * batch_size, data_len)
-        feed_dict = {
-            model.x: x_test[start_id:end_id],
-            model.keep_prob: 1.0
-        }
-        y_pred[start_id:end_id] = session.run(
-            model.y_pred, feed_dict=feed_dict)
-        count = 0
-    for i in range(len(x_test)):
-        if str(y_pred[i]) == str(y_test[i]):
-            count += 1
-    print(count)
-#        with open(file=base_dir+'/'+str(y_pred[i])+'.txt',mode='a',encoding='utf8') as f:
-#            f.write(str(x_text[i])+'\n')
 
 
 if __name__ == '__main__':
