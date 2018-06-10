@@ -21,6 +21,15 @@
   <ItemGroup>
     <Compile Include=".vscode\.ropeproject\config.py" />
     <Compile Include="cnn_model.py" />
+    <Compile Include="predictor\cnn_model.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="predictor\predictor.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="predictor\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="prepareData.py" />
     <Compile Include="run_cnn.py" />
   </ItemGroup>
@@ -33,6 +42,7 @@
     <Folder Include=".vscode\" />
     <Folder Include=".vscode\.ropeproject" />
     <Folder Include="good" />
+    <Folder Include="predictor\" />
   </ItemGroup>
   <ItemGroup>
     <InterpreterReference Include="Global|PythonCore|3.6" />
