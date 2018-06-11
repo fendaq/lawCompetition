@@ -15,7 +15,7 @@ class TCNNConfig(object):
 
     learning_rate = 1e-5  # 学习率
 
-    batch_size = 64  # 每批训练大小
+    batch_size = 128  # 每批训练大小
     num_epochs = 10000  # 总迭代轮次
     kernel_size = 5
     print_per_batch = 100  # 每多少轮输出一次结果
