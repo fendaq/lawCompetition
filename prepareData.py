@@ -5,19 +5,21 @@ def read_data(file_name, target_case="term_of_imprisonment"):
         for line in f:
             content = json.loads(line)["fact"]
             label = json.loads(line)["meta"][target_case]
+            res_temp = []
             if target_case == "term_of_imprisonment":
                 if label["death_penalty"]:
-                    label = 301
+                    res_temp.append(301)
                 elif label["life_imprisonment"]:
-                    label = 302
+                    res_temp.append(302)
                 else:
-                    label = label["imprisonment"]
+                    res_temp.append(label["imprisonment"])
             else:
-                temp = str(label[0]).replace('[', '')
-                label = temp.replace(']', '')
+                for _, res in enumerate(label):
+                    temp = str(res).replace('[', '').replace(']', '')
+                    res_temp.append(temp)
             if content:
                 contents.append(content)
-                labels.append(label)
+                labels.append(res_temp)
     return contents, labels
 
 
@@ -90,20 +92,27 @@ def get_data_with_vocab(data_dir, words_to_id, cat_to_id, vocab_length, target_c
     import keras
     print("get data from {0}...".format(data_dir))
     contents, labels = read_data(data_dir, target_case)
-    labels[0]=-2
     data_id, label_id, all_data = [], [], []
     for i in range(len(contents)):
         all_data.append(contents[i]+'split'+str(labels[i]))
     for i in range(len(contents)):
+        temp_label = []
         data_id.append([words_to_id[x]
                         for x in contents[i] if x in words_to_id])
         if target_case != 'term_of_imprisonment':
-            label_id.append(cat_to_id[labels[i]])
+            for _, label in enumerate(labels[i]):
+                temp_label.append(cat_to_id[label])
+            label_id.append(temp_label)
         else:
             label_id.append(labels[i])
     x_data = keras.preprocessing.sequence.pad_sequences(
         data_id, int(vocab_length), dtype='float32')
-    y_data = keras.utils.to_categorical(label_id, num_classes=303)
+    y_data = []
+    for _, label in enumerate(label_id):
+        temp_label = [0 for _ in range(303)]
+        for _, solo in enumerate(label):
+            temp_label[solo] = 1
+        y_data.append(temp_label)
     return x_data, y_data, all_data
 
 
