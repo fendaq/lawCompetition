@@ -7,9 +7,9 @@ def read_data(file_name, target_case="term_of_imprisonment"):
             label = json.loads(line)["meta"][target_case]
             if target_case == "term_of_imprisonment":
                 if label["death_penalty"]:
-                    label = -2
+                    label = 301
                 elif label["life_imprisonment"]:
-                    label = -1
+                    label = 302
                 else:
                     label = label["imprisonment"]
             else:
