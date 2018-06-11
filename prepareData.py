@@ -5,32 +5,35 @@ def read_data(file_name, target_case="term_of_imprisonment"):
         for line in f:
             content = json.loads(line)["fact"]
             label = json.loads(line)["meta"][target_case]
-            res_temp = []
             if target_case == "term_of_imprisonment":
                 if label["death_penalty"]:
-                    res_temp.append(301)
+                    label = 301
                 elif label["life_imprisonment"]:
-                    res_temp.append(302)
+                    label = 302
                 else:
-                    res_temp.append(label["imprisonment"])
+                    label = label["imprisonment"]
             else:
-                for _, res in enumerate(label):
-                    temp = str(res).replace('[', '').replace(']', '')
-                    res_temp.append(temp)
+                temp = str(label[0]).replace('[', '')
+                label = temp.replace(']', '')
             if content:
                 contents.append(content)
-                labels.append(res_temp)
+                labels.append(label)
     return contents, labels
 
 
 def build_vocab(train_dir, valid_dir, test_dir, vocab_dir, vocab_size, min_frequence):
     from collections import Counter
+    import thulac
     contents, _ = read_data(test_dir)
     temp, _ = read_data(valid_dir)
     contents += temp
     temp, _ = read_data(train_dir)
     contents += temp
-
+    with open(file='temp.txt',mode='w',encoding='utf8') as temp_file:
+        for line in contents:
+            line.replace('，','').replace('、','').replace('xx','').replace('：','')
+            temp_file.write(line)
+            temp_file.write('\n')
     all_data = []
     for content in contents:
         all_data.extend(content)
@@ -96,23 +99,15 @@ def get_data_with_vocab(data_dir, words_to_id, cat_to_id, vocab_length, target_c
     for i in range(len(contents)):
         all_data.append(contents[i]+'split'+str(labels[i]))
     for i in range(len(contents)):
-        temp_label = []
         data_id.append([words_to_id[x]
                         for x in contents[i] if x in words_to_id])
         if target_case != 'term_of_imprisonment':
-            for _, label in enumerate(labels[i]):
-                temp_label.append(cat_to_id[label])
-            label_id.append(temp_label)
+            label_id.append(cat_to_id[labels[i]])
         else:
             label_id.append(labels[i])
     x_data = keras.preprocessing.sequence.pad_sequences(
         data_id, int(vocab_length), dtype='float32')
-    y_data = []
-    for _, label in enumerate(label_id):
-        temp_label = [0 for _ in range(303)]
-        for _, solo in enumerate(label):
-            temp_label[solo] = 1
-        y_data.append(temp_label)
+    y_data = keras.utils.to_categorical(label_id, num_classes=303)
     return x_data, y_data, all_data
 
 
@@ -160,8 +155,8 @@ def balance_data(base_dir):
 
 
 def main():
-    build_vocab('D:/cail/good/data_train.json', 'D:/cail/good/data_valid.json', 'D:/cail/good/data_test.json',
-                'D:/cail/good/vocab.txt', vocab_size=5000, min_frequence=10)
+    build_vocab('./good/data_train.json', './good/data_valid.json', './good/data_test.json',
+                './good/vocab.txt', vocab_size=5000, min_frequence=10)
 
 
 if __name__ == '__main__':

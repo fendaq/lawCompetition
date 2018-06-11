@@ -70,7 +70,7 @@ class CharLevelCNN(object):
             self.l2_loss += tf.nn.l2_loss(W)
             self.l2_loss += tf.nn.l2_loss(b)
             self.logits = tf.nn.xw_plus_b(fc, W, b)
-            #self.y_pred = tf.argmax(tf.nn.softmax(self.logits), 1)  # 预测类别
+            self.y_pred = tf.argmax(tf.nn.softmax(self.logits), 1)  # 预测类别
 
         with tf.name_scope("optimize"):
             # 损失函数，交叉熵
