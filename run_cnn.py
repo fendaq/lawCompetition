@@ -18,7 +18,7 @@ train_dir = os.path.join(base_dir, 'data_train.json')
 test_dir = os.path.join(base_dir, 'data_test.json')
 valid_dir = os.path.join(base_dir, 'data_valid.json')
 vocab_dir = os.path.join(base_dir, 'vocab.txt')
-target_name = 'term_of_imprisonment'
+target_name = 'relevant_articles'
 if target_name == 'accusation':
     cat_dir = os.path.join(base_dir, 'accu.txt')
 else:
@@ -193,13 +193,13 @@ if __name__ == '__main__':
     words, word_to_id = read_vocab(vocab_dir)
     config.vocab_size = len(words)
 
-    #x_train_, y_train_, _ = get_data_with_vocab(
-        #train_dir, word_to_id, cat_to_id, config.seq_length, target_case=target_name)
+    x_train_, y_train_, _ = get_data_with_vocab(
+        train_dir, word_to_id, cat_to_id, config.seq_length, target_case=target_name)
     x_val_, y_val_, _ = get_data_with_vocab(
-        #valid_dir, word_to_id, cat_to_id, config.seq_length, target_case=target_name)
-    #x_test_, y_test_, _ = get_data_with_vocab(
+        valid_dir, word_to_id, cat_to_id, config.seq_length, target_case=target_name)
+    x_test_, y_test_, _ = get_data_with_vocab(
         test_dir, word_to_id, cat_to_id, config.seq_length, target_case=target_name)
     model = cnn_model.CharLevelCNN(config)
-    #train(x_train_, y_train_, x_val_, y_val_)
+    train(x_train_, y_train_, x_val_, y_val_)
     #y_pred=test(x_test_, y_test_)
     #np.savetxt(target_name+'.txt',y_pred)
