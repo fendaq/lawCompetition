@@ -6,7 +6,7 @@ class TCNNConfig(object):
     """CNN配置参数"""
     vocab_dim = 400
     embedding_size = 128  # 词向量维度
-    seq_length = 300  # 序列长度
+    seq_length = 500  # 序列长度
     num_classes = 303  # 类别数
     num_filters = 256  # 卷积核数目
     filter_size = [2, 3, 4, 5]  # 卷积核尺寸
@@ -14,7 +14,7 @@ class TCNNConfig(object):
 
     hidden_dim = 1024  # 全连接层神经元
 
-    learning_rate = 1e-5  # 学习率
+    learning_rate = 1e-4  # 学习率
 
     batch_size = 128  # 每批训练大小
     num_epochs = 10000  # 总迭代轮次
@@ -48,12 +48,16 @@ class CharLevelCNN(object):
                 'embedding', [self.config.vocab_size, self.config.embedding_size])
             embedding_inputs = tf.nn.embedding_lookup(embedding, self.x)
 
-        with tf.name_scope("cnn"):
+        with tf.name_scope("cnn_1"):
             # CNN layer
-            conv = tf.layers.conv1d(
-                embedding_inputs, self.config.num_filters, self.config.kernel_size, name='conv')
-            # global max pooling layer
-            gmp = tf.reduce_max(conv, reduction_indices=[1], name='gmp')
+            conv_1 = tf.layers.conv1d(embedding_inputs, 64, 3, name='conv1',trainable=True,padding='same')
+            conv_1=tf.nn.relu(conv_1)
+            max_pool_1=tf.layers.max_pooling1d(conv_1,2,strides=1,padding='same')
+            conv_2=tf.layers.conv1d(max_pool_1,64, 1, name='conv2')
+            conv_3=tf.layers.conv1d(conv_2,32, 3, name='conv3')
+            max_pool_3=tf.layers.max_pooling1d(conv_3,1,strides=1,padding='same')
+            gmp=tf.reduce_max(max_pool_3, reduction_indices=[1], name='gmp')
+
 
         with tf.name_scope("score"):
             # 全连接层，后面接dropout以及relu激活
