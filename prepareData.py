@@ -100,7 +100,7 @@ def get_data_with_vocab(data_dir, words_to_id, cat_to_id, vocab_length, target_c
         if target_case != 'term_of_imprisonment':
             label_id.append(cat_to_id[labels[i]])
         else:
-            label_id.append(labels[i]+2)
+            label_id.append(labels[i])
     x_data = keras.preprocessing.sequence.pad_sequences(
         data_id, int(vocab_length), dtype='float32')
     y_data = keras.utils.to_categorical(label_id, num_classes=303)
