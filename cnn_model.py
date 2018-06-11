@@ -70,7 +70,7 @@ class CharLevelCNN(object):
             self.l2_loss += tf.nn.l2_loss(W)
             self.l2_loss += tf.nn.l2_loss(b)
             self.logits = tf.nn.xw_plus_b(fc, W, b)
-            self.y_pred = tf.argmax(tf.nn.softmax(self.logits), 1)  # 预测类别
+            #self.y_pred = tf.argmax(tf.nn.softmax(self.logits), 1)  # 预测类别
 
         with tf.name_scope("optimize"):
             # 损失函数，交叉熵
@@ -84,5 +84,5 @@ class CharLevelCNN(object):
 
         with tf.name_scope("accuracy"):
             # 准确率
-            correct_pred = tf.equal(tf.argmax(self.y, 1), self.y_pred)
+            correct_pred = tf.equal(self.logits,self.y)
             self.precision = tf.reduce_mean(tf.cast(correct_pred, tf.float32))
