@@ -13,7 +13,7 @@ class Predictor():
         self.model_dir = os.path.dirname(__file__)+'/model/'
         self.accusation_model = self.model_dir+'accusation/best_valid'
         self.relevant_model = self.model_dir+'relevant_articles/best_valid'
-        self.year_model = self.model_dir+'year/best_validation'
+        self.year_model = self.model_dir+'year/best_valid'
         self.vocab_dir = self.model_dir+'vocab.txt'
         self.seq_length = self.config.seq_length
 

@@ -141,6 +141,7 @@ def train(x_train, y_train, x_val, y_val):
             break
 
 
+
 def test(x_test, y_test):
     print("Loading test data...")
     start_time = time.time()
@@ -172,15 +173,14 @@ def test(x_test, y_test):
             model.y_pred, feed_dict=feed_dict)
 
     # 评估
-    print("Precision, Recall and F1-Score...")
-    print(metrics.classification_report(
-        y_true=y_test, y_pred=y_pred, target_names=categories))
 
     # 混淆矩阵
-
     time_dif = get_time_dif(start_time)
     print("Time usage:", time_dif)
-
+    y_res=[]
+    for _, pred in enumerate(y_pred):
+        y_res.append(int(pred))
+    return y_res
 
 
 if __name__ == '__main__':
@@ -193,12 +193,13 @@ if __name__ == '__main__':
     words, word_to_id = read_vocab(vocab_dir)
     config.vocab_size = len(words)
 
-    x_train_, y_train_, _ = get_data_with_vocab(
-        train_dir, word_to_id, cat_to_id, config.seq_length, target_case=target_name)
-    x_val_, y_val_, _ = get_data_with_vocab(
-        valid_dir, word_to_id, cat_to_id, config.seq_length, target_case=target_name)
+    #x_train_, y_train_, _ = get_data_with_vocab(
+        #train_dir, word_to_id, cat_to_id, config.seq_length, target_case=target_name)
+    #x_val_, y_val_, _ = get_data_with_vocab(
+        #valid_dir, word_to_id, cat_to_id, config.seq_length, target_case=target_name)
     x_test_, y_test_, _ = get_data_with_vocab(
         test_dir, word_to_id, cat_to_id, config.seq_length, target_case=target_name)
     model = cnn_model.CharLevelCNN(config)
-    train(x_train_, y_train_, x_val_, y_val_)
-    test(x_test_, y_test_)
+    #train(x_train_, y_train_, x_val_, y_val_)
+    y_pred=test(x_test_, y_test_)
+    np.savetxt(target_name+'.txt',y_pred)
