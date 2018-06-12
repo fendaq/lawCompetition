@@ -30,6 +30,7 @@ def build_vocab(train_dir, valid_dir, test_dir, vocab_dir, vocab_size, min_frequ
     contents += temp
     temp, _ = read_data(train_dir)
     contents += temp
+    all_data = []
     if split:
         temp_for_split = str()
         for index, line in enumerate(contents):
@@ -41,14 +42,21 @@ def build_vocab(train_dir, valid_dir, test_dir, vocab_dir, vocab_size, min_frequ
                 with open(file='temp', mode='a', encoding='utf8') as temp_file:
                     temp_file.write(split_content)
                 temp_for_split = ''
-    all_data = []
-    for content in contents:
-        all_data.extend(content)
+        with open(file='temp', mode='r', encoding='utf8') as temp_file:
+            for line in temp_file.readlines():
+                all_data.append(line)
+    else:
+        for content in contents:
+            all_data.extend(content)
+
 
     counter = Counter(all_data)
     count_pairs = counter.most_common(vocab_size-1)
     vocab_list = list(zip(*count_pairs))
-    index = vocab_list[1].index(min_frequence)
+    if min_frequence>=0:
+        index = vocab_list[1].index(min_frequence)
+    else:
+         index=len(vocab_list)
     words = vocab_list[0]
     # 添加一个 <PAD> 来将所有文本pad为同一长度
     words = ['<PAD>'] + list(words)[:index]
@@ -164,7 +172,7 @@ def balance_data(base_dir):
 
 def main():
     build_vocab('./good/data_train.json', './good/data_valid.json', './good/data_test.json',
-                './good/vocab.txt', vocab_size=5000, min_frequence=10, split=True)
+                './good/vocab.txt', vocab_size=5000, min_frequence=-1, split=True)
 
 
 if __name__ == '__main__':
