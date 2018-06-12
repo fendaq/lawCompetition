@@ -1,6 +1,7 @@
 def read_data(file_name, target_case="term_of_imprisonment"):
     import json
     contents, labels = [], []
+    print('getting data from'+file_name)
     with open(file=file_name, mode='r', encoding='utf8') as f:
         for line in f:
             content = json.loads(line)["fact"]
@@ -31,10 +32,10 @@ def build_vocab(train_dir, valid_dir, test_dir, vocab_dir, vocab_size, min_frequ
     contents += temp
     if split:
         temp_for_split = str()
-        for line in contents:
-            line = line.replace('，', '').replace(
-                '、', '').replace('x', '').replace('：', '')
+        for line,line in enumerate(contents):
             temp_for_split = temp_for_split+'\n'+line
+            if line%10000==0:
+                print(line/10000)
         split_content = " ".join(jieba.cut(temp_for_split))
         with open(file='temp.txt', mode='w', encoding='utf8') as temp_file:
             temp_file.write(split_content)
