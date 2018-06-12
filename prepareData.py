@@ -32,13 +32,15 @@ def build_vocab(train_dir, valid_dir, test_dir, vocab_dir, vocab_size, min_frequ
     contents += temp
     if split:
         temp_for_split = str()
-        for line,line in enumerate(contents):
+        for index, line in enumerate(contents):
             temp_for_split = temp_for_split+'\n'+line
-            if line%10000==0:
-                print(line/10000)
-        split_content = " ".join(jieba.cut(temp_for_split))
-        with open(file='temp.txt', mode='w', encoding='utf8') as temp_file:
-            temp_file.write(split_content)
+            if index % 10000 == 0:
+                print(index/10000)
+            if index & 30000 == 0:
+                split_content = " ".join(jieba.cut(temp_for_split))
+                with open(file='temp', mode='a', encoding='utf8') as temp_file:
+                    temp_file.write(split_content)
+                temp_for_split = ''
     all_data = []
     for content in contents:
         all_data.extend(content)
