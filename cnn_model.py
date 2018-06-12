@@ -85,5 +85,9 @@ class CharLevelCNN(object):
 
         with tf.name_scope("accuracy"):
             # 准确率
+<<<<<<< HEAD
             correct_pred = tf.equal(self.logits, self.y)
+=======
+            correct_pred = tf.equal(self.y_pred,tf.argmax(self.y,1))
+>>>>>>> 879e41daef59f27cdc35451afa4598924a7f412c
             self.precision = tf.reduce_mean(tf.cast(correct_pred, tf.float32))
