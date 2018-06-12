@@ -21,19 +21,23 @@ def read_data(file_name, target_case="term_of_imprisonment"):
     return contents, labels
 
 
-def build_vocab(train_dir, valid_dir, test_dir, vocab_dir, vocab_size, min_frequence):
+def build_vocab(train_dir, valid_dir, test_dir, vocab_dir, vocab_size, min_frequence, split=False):
     from collections import Counter
-    import thulac
-    contents, _ = read_data(test_dir)
-    temp, _ = read_data(valid_dir)
+    import jieba
+    contents, _ = read_data(valid_dir)
+    temp, _ = read_data(test_dir)
     contents += temp
     temp, _ = read_data(train_dir)
     contents += temp
-    with open(file='temp.txt',mode='w',encoding='utf8') as temp_file:
+    if split:
+        temp_for_split = str()
         for line in contents:
-            line.replace('，','').replace('、','').replace('xx','').replace('：','')
-            temp_file.write(line)
-            temp_file.write('\n')
+            line = line.replace('，', '').replace(
+                '、', '').replace('x', '').replace('：', '')
+            temp_for_split = temp_for_split+'\n'+line
+        split_content = " ".join(jieba.cut(temp_for_split))
+        with open(file='temp.txt', mode='w', encoding='utf8') as temp_file:
+            temp_file.write(split_content)
     all_data = []
     for content in contents:
         all_data.extend(content)
@@ -47,6 +51,7 @@ def build_vocab(train_dir, valid_dir, test_dir, vocab_dir, vocab_size, min_frequ
     words = ['<PAD>'] + list(words)[:index]
     with open(vocab_dir, mode='w', encoding='utf8') as f:
         f.write('\n'.join(words) + '\n')
+    print('build success')
 
 
 def read_vocab(vocab_dir):
@@ -156,7 +161,7 @@ def balance_data(base_dir):
 
 def main():
     build_vocab('./good/data_train.json', './good/data_valid.json', './good/data_test.json',
-                './good/vocab.txt', vocab_size=5000, min_frequence=10)
+                './good/vocab.txt', vocab_size=5000, min_frequence=10, split=True)
 
 
 if __name__ == '__main__':
