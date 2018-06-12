@@ -61,18 +61,10 @@ if __name__ == "__main__":
 
         for line in inf:
             fact.append(json.loads(line)["fact"])
-            if len(fact) == get_batch():
-                result = solve(fact)
-                cnt += len(result)
-                for x in result:
-                    print(json.dumps(x), file=ouf)
-                fact = []
+        result = solve(fact)
+        for x in result:
+            print(json.dumps(x), file=ouf)
+        fact = []
 
-        if len(fact) != 0:
-            result = solve(fact)
-            cnt += len(result)
-            for x in result:
-                print(json.dumps(x), file=ouf)
-            fact = []
 
         ouf.close()
