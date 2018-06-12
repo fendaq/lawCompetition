@@ -49,14 +49,13 @@ def build_vocab(train_dir, valid_dir, test_dir, vocab_dir, vocab_size, min_frequ
         for content in contents:
             all_data.extend(content)
 
-
     counter = Counter(all_data)
     count_pairs = counter.most_common(vocab_size-1)
     vocab_list = list(zip(*count_pairs))
-    if min_frequence>=0:
+    if min_frequence >= 0:
         index = vocab_list[1].index(min_frequence)
     else:
-         index=len(vocab_list)
+        index = len(vocab_list)
     words = vocab_list[0]
     # 添加一个 <PAD> 来将所有文本pad为同一长度
     words = ['<PAD>'] + list(words)[:index]
