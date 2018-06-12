@@ -1,5 +1,4 @@
 import tensorflow as tf
-import pickle
 
 
 class TCNNConfig(object):
@@ -50,14 +49,16 @@ class CharLevelCNN(object):
 
         with tf.name_scope("cnn_1"):
             # CNN layer
-            conv_1 = tf.layers.conv1d(embedding_inputs, 64, 3, name='conv1',trainable=True,padding='same')
-            conv_1=tf.nn.relu(conv_1)
-            max_pool_1=tf.layers.max_pooling1d(conv_1,2,strides=1,padding='same')
-            conv_2=tf.layers.conv1d(max_pool_1,64, 1, name='conv2')
-            conv_3=tf.layers.conv1d(conv_2,32, 3, name='conv3')
-            max_pool_3=tf.layers.max_pooling1d(conv_3,1,strides=1,padding='same')
-            gmp=tf.reduce_max(max_pool_3, reduction_indices=[1], name='gmp')
-
+            conv_1 = tf.layers.conv1d(
+                embedding_inputs, 64, 3, name='conv1', trainable=True, padding='same')
+            conv_1 = tf.nn.relu(conv_1)
+            max_pool_1 = tf.layers.max_pooling1d(
+                conv_1, 2, strides=1, padding='same')
+            conv_2 = tf.layers.conv1d(max_pool_1, 64, 1, name='conv2')
+            conv_3 = tf.layers.conv1d(conv_2, 32, 3, name='conv3')
+            max_pool_3 = tf.layers.max_pooling1d(
+                conv_3, 1, strides=1, padding='same')
+            gmp = tf.reduce_max(max_pool_3, reduction_indices=[1], name='gmp')
 
         with tf.name_scope("score"):
             # 全连接层，后面接dropout以及relu激活
@@ -84,5 +85,5 @@ class CharLevelCNN(object):
 
         with tf.name_scope("accuracy"):
             # 准确率
-            correct_pred = tf.equal(self.logits,self.y)
+            correct_pred = tf.equal(self.logits, self.y)
             self.precision = tf.reduce_mean(tf.cast(correct_pred, tf.float32))
