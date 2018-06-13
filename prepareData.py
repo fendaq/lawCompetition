@@ -194,7 +194,8 @@ def balance_data(base_dir):
 
 
 def main():
-    build_vocab('./good/data_train.json', './good/data_valid.json', './good/data_test.json',
+    split_data('./good/data_train','./good/data_valid','./data_test')
+    #build_vocab('./good/data_train.json', './good/data_valid.json', './good/data_test.json',
                 './good/vocab.txt', vocab_size=7000, min_frequence=-1, split=False)
 
 
