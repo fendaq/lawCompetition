@@ -141,15 +141,45 @@ def split_data(train_dir, val_dir, test_dir):
     import jieba
     import json
     contents = []
-    with open(file=val_dir+'.json', mode='r') as input_file:
+    with open(file=val_dir+'.json', mode='r',encoding='utf8') as input_file:
+        index=1
         for line in input_file.readlines():
-            temp = jieba.cut(str(json.loads(line)["fact"]).replace(
-                '，', '').replace(' ', ''))
+            index+=1
+            temp=str(json.loads(line)["fact"]).replace(
+                '，', '').replace(' ', '')
+            temp = ' '.join(jieba.cut(temp))
             meta = json.loads(line)["meta"]
-            contents.append(json.dumps({"fact": temp, "meta": meta}))
-    with open(file=val_dir+'_split.json', mode='w') as output_file:
+            contents.append(str({"fact": temp, "meta": meta}).replace('\'','\"').replace('False','false').replace('True','true')+'\n')
+    with open(file=val_dir+'_split.json', mode='w',encoding='utf8') as output_file:
         for _, content in enumerate(contents):
-            output_file.write(content+'/n')
+            output_file.write(content)
+   
+    with open(file=test_dir+'.json', mode='r',encoding='utf8') as input_file:
+        index=1
+        for line in input_file.readlines():
+            index+=1
+            temp=str(json.loads(line)["fact"]).replace(
+                '，', '').replace(' ', '')
+            temp = ' '.join(jieba.cut(temp))
+            meta = json.loads(line)["meta"]
+            contents.append(str({"fact": temp, "meta": meta}).replace('\'','\"').replace('False','false').replace('True','true')+'\n')
+    with open(file=test_dir+'_split.json', mode='w',encoding='utf8') as output_file:
+        for _, content in enumerate(contents):
+            output_file.write(content)
+
+    with open(file=train_dir+'.json', mode='r',encoding='utf8') as input_file:
+        index=1
+        for line in input_file.readlines():
+            index+=1
+            temp=str(json.loads(line)["fact"]).replace(
+                '，', '').replace(' ', '')
+            temp = ' '.join(jieba.cut(temp))
+            meta = json.loads(line)["meta"]
+            contents.append(str({"fact": temp, "meta": meta}).replace('\'','\"').replace('False','false').replace('True','true')+'\n')
+    with open(file=train_dir+'_split.json', mode='w',encoding='utf8') as output_file:
+        for _, content in enumerate(contents):
+            output_file.write(content)
+    print('success')
 
 
 def to_words(content, words):
