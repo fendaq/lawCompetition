@@ -11,7 +11,7 @@ class TCNNConfig(object):
     num_filters = 256  # 卷积核数目
     filter_size = [2, 3, 4, 5]  # 卷积核尺寸
     vocab_size = 100000  # 词汇表大小
-    vocab_init = True
+    vocab_init = False
     hidden_dim = 1024  # 全连接层神经元
     hierachy_init = False
     learning_rate = 1e-4  # 学习率
