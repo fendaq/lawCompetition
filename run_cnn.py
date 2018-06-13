@@ -8,9 +8,8 @@ import time
 from datetime import timedelta
 import numpy as np
 import tensorflow as tf
-from sklearn import metrics
 
-from prepareData import read_vocab, batch_iter, get_data_with_vocab, build_vocab, read_catagory
+from prepareData import read_vocab, batch_iter, get_data_with_vocab, build_vocab, read_catagory, read_word2vec
 import cnn_model
 
 base_dir = './good'
@@ -23,7 +22,7 @@ if target_name == 'accusation':
     cat_dir = os.path.join(base_dir, 'accu.txt')
 else:
     cat_dir = os.path.join(base_dir, 'law.txt')
-#任务类型有三种，accusation,term_of_imprisonment,relevant_articles
+# 任务类型有三种，accusation,term_of_imprisonment,relevant_articles
 
 save_dir = './model/'+target_name
 save_path = os.path.join(save_dir, 'best_valid')  # 最佳验证结果保存路径
@@ -141,7 +140,6 @@ def train(x_train, y_train, x_val, y_val):
             break
 
 
-
 def test(x_test, y_test):
     print("Loading test data...")
     start_time = time.time()
@@ -177,7 +175,7 @@ def test(x_test, y_test):
     # 混淆矩阵
     time_dif = get_time_dif(start_time)
     print("Time usage:", time_dif)
-    y_res=[]
+    y_res = []
     for _, pred in enumerate(y_pred):
         y_res.append(int(pred))
     return y_res
@@ -190,16 +188,20 @@ if __name__ == '__main__':
         build_vocab(train_dir, valid_dir, test_dir,
                     vocab_dir, config.vocab_size, 10)
     categories, cat_to_id = read_catagory(cat_dir)
-    words, word_to_id = read_vocab(vocab_dir)
-    config.vocab_size = len(words)
 
-    x_train_, y_train_, _ = get_data_with_vocab(
-        train_dir, word_to_id, cat_to_id, config.seq_length, target_case=target_name)
-    x_val_, y_val_, _ = get_data_with_vocab(
-        valid_dir, word_to_id, cat_to_id, config.seq_length, target_case=target_name)
-    x_test_, y_test_, _ = get_data_with_vocab(
-        test_dir, word_to_id, cat_to_id, config.seq_length, target_case=target_name)
+    if config.vocab_init:
+        words, word_to_id = read_word2vec(vocab_dir)
+    else:
+        words, word_to_id = read_vocab(vocab_dir)
+
+    config.vocab_size = len(words)
+    x_train_, y_train_ = get_data_with_vocab(
+        train_dir, word_to_id, cat_to_id, config, target_case=target_name)
+    x_val_, y_val_ = get_data_with_vocab(
+        valid_dir, word_to_id, cat_to_id, config, target_case=target_name)
+    x_test_, y_test_ = get_data_with_vocab(
+        test_dir, word_to_id, cat_to_id, config, target_case=target_name)
     model = cnn_model.CharLevelCNN(config)
     train(x_train_, y_train_, x_val_, y_val_)
-    y_pred=test(x_test_, y_test_)
-    #np.savetxt(target_name+'.txt',y_pred)
+    y_pred = test(x_test_, y_test_)
+    # np.savetxt(target_name+'.txt',y_pred)

@@ -4,7 +4,8 @@ def read_data(file_name, target_case="term_of_imprisonment"):
     print('getting data from'+file_name)
     with open(file=file_name, mode='r', encoding='utf8') as f:
         for line in f:
-            content = json.loads(line)["fact"]
+            content = str(json.loads(line)["fact"]).replace(
+                '，', '').replace(' ', '')
             label = json.loads(line)["meta"][target_case]
             if target_case == "term_of_imprisonment":
                 if label["death_penalty"]:
@@ -14,7 +15,8 @@ def read_data(file_name, target_case="term_of_imprisonment"):
                 else:
                     label = label["imprisonment"]
             else:
-                temp = str(label[0]).replace('[', '')
+                temp = str(label[0]).replace(
+                    '[', '').replace('，', '').replace(' ', '')
                 label = temp.replace(']', '')
             if content:
                 contents.append(content)
@@ -44,7 +46,7 @@ def build_vocab(train_dir, valid_dir, test_dir, vocab_dir, vocab_size, min_frequ
                 temp_for_split = ''
         with open(file='temp', mode='r', encoding='utf8') as temp_file:
             for line in temp_file.readlines():
-                all_data.append(line)
+                all_data.extend(line.strip().split(' '))
     else:
         for content in contents:
             all_data.extend(content)
@@ -55,7 +57,7 @@ def build_vocab(train_dir, valid_dir, test_dir, vocab_dir, vocab_size, min_frequ
     if min_frequence >= 0:
         index = vocab_list[1].index(min_frequence)
     else:
-        index = len(vocab_list)
+        index = len(vocab_list[0])
     words = vocab_list[0]
     # 添加一个 <PAD> 来将所有文本pad为同一长度
     words = ['<PAD>'] + list(words)[:index]
@@ -82,7 +84,7 @@ def read_word2vec(vocab_dir):
                 words.append(line.strip().split(' ')[0])
                 vectors.append(line.strip().split(' ')[1:])
         word_to_id = dict(zip(words, vectors))
-    return words, word_to_id, vocab_length, vocab_dim
+    return words, word_to_id
 
 
 def batch_iter(x, y, batch_size, shuffle=True):
@@ -106,24 +108,33 @@ def batch_iter(x, y, batch_size, shuffle=True):
         yield x_shuffle[start_index:end_index], y_shuffle[start_index:end_index]
 
 
-def get_data_with_vocab(data_dir, words_to_id, cat_to_id, vocab_length, target_case='term_of_imprisonment'):
+def get_data_with_vocab(data_dir, words_to_id, cat_to_id, config, target_case='term_of_imprisonment'):
     import keras
     print("get data from {0}...".format(data_dir))
     contents, labels = read_data(data_dir, target_case)
-    data_id, label_id, all_data = [], [], []
+    data_id, label_id = [], []
     for i in range(len(contents)):
-        all_data.append(contents[i]+'split'+str(labels[i]))
-    for i in range(len(contents)):
-        data_id.append([words_to_id[x]
-                        for x in contents[i] if x in words_to_id])
+        sentence_id = []
+        if config.hierachy_init:
+            sentences = contents[i].split('。')
+            for _, sentence in enumerate(sentences):
+                sentence_id.append([words_to_id[x]
+                                    for x in sentence if x in words_to_id])
+            sentence_pad = keras.preprocessing.sequence.pad_sequences(
+                sentence_id, int(config.seq_length), dtype='float32')
+            data_id.append(sentence_pad)
+        else:
+            data_id.append([words_to_id[x]
+                            for x in contents[i] if x in words_to_id])
         if target_case != 'term_of_imprisonment':
             label_id.append(cat_to_id[labels[i]])
         else:
             label_id.append(labels[i])
+
     x_data = keras.preprocessing.sequence.pad_sequences(
-        data_id, int(vocab_length), dtype='float32')
+        data_id, int(config.para_length), dtype='float32')
     y_data = keras.utils.to_categorical(label_id, num_classes=303)
-    return x_data, y_data, all_data
+    return x_data, y_data
 
 
 def to_words(content, words):
@@ -171,7 +182,7 @@ def balance_data(base_dir):
 
 def main():
     build_vocab('./good/data_train.json', './good/data_valid.json', './good/data_test.json',
-                './good/vocab.txt', vocab_size=5000, min_frequence=-1, split=True)
+                './good/vocab.txt', vocab_size=7000, min_frequence=-1, split=True)
 
 
 if __name__ == '__main__':

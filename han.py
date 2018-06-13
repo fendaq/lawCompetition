@@ -1,6 +1,13 @@
 import tensorflow as tf
 
 
+def length(sequences):
+    # 返回一个序列中每个元素的长度
+    used = tf.sign(tf.reduce_max(tf.abs(sequences), reduction_indices=2))
+    seq_len = tf.reduce_sum(used, reduction_indices=1)
+    return tf.cast(seq_len, tf.int32)
+
+
 class TCNNConfig(object):
     """CNN配置参数"""
     vocab_dim = 400
@@ -13,7 +20,7 @@ class TCNNConfig(object):
     vocab_size = 4896  # 词汇表大小
     vocab_init = True
     hidden_dim = 1024  # 全连接层神经元
-    hierachy_init = False
+    hierachy_init = True
     learning_rate = 1e-4  # 学习率
 
     batch_size = 128  # 每批训练大小
@@ -39,6 +46,36 @@ class CharLevelCNN(object):
         self.l2_lambda = 0.2
 
         self.char_level_cnn()
+
+    def AttentionLayer(self, inputs, name):
+        with tf.variable_scope(name):
+            u_context = tf.Variable(tf.truncated_normal(
+                [self.config.hidden_dim]), name='u_context')
+            h = tf.contrib.layers.fully_connected(
+                inputs, self.config.hidden_dim*2, activation_fn=tf.nn.tanh)
+            alpha = tf.nn.softmax(tf.reduce_sum(
+                tf.multiply(h, u_context), keep_dims=True), dim=1)
+            atten_output = tf.reduce_sum(tf.multiply(inputs, alpha), axis=1)
+            return atten_output
+
+    def BidirectionalGRUEncoder(self, inputs, name):
+        with tf.variable_scope(name):
+            GRU_cell_fw = tf.contrib.layers.rnn.GRUCell(self.config.hidden_dim)
+            GRU_cell_bw = tf.contrib.layers.rnn.GRUCell(self.config.hidden_dim)
+            ((fw_outputs, bw_outputs), (_, _)) = tf.nn.bidirectional_dynamic_rnn(cell_fw=GRU_cell_fw, cell_bw=GRU_cell_bw,
+                                                                                 inputs=inputs, sequence_length=length(inputs), dtype=tf.float32)
+            out_puts = tf.concat((fw_outputs, bw_outputs), 2)
+            return out_puts
+
+    def sentence2vec(self, inputs):
+        with tf.variable_scope("sentence2vec"):
+            word_embedded = tf.reshape(
+                inputs, [-1, self.config.seq_length, self.config.embedding_size])
+            word_encoded = self.BidirectionalGRUEncoder(
+                word_embedded, name='word_encoder')
+            sentence_vec = self.AttentionLayer(
+                word_encoded, name='word_attention')
+            return sentence_vec
 
     def char_level_cnn(self):
         """CNN模型"""
