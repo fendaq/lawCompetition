@@ -111,7 +111,6 @@ def batch_iter(x, y, batch_size, shuffle=True):
 def get_data_with_vocab(data_dir, words_to_id, cat_to_id, config, target_case='term_of_imprisonment'):
     import keras
     import jieba
-    print("get data from {0}...".format(data_dir))
     contents, labels = read_data(data_dir, target_case)
     data_id, label_id = [], []
     for i in range(len(contents)):
@@ -137,6 +136,19 @@ def get_data_with_vocab(data_dir, words_to_id, cat_to_id, config, target_case='t
     y_data = keras.utils.to_categorical(label_id, num_classes=303)
     return x_data, y_data
 
+def split_data(train_dir, val_dir, test_dir):
+    import jieba
+    import json
+    contents=[]
+    with open(file=val_dir+'.json',mode='r') as input_file:
+        for line in input_file.readlines():
+            temp=jieba.cut(str(json.loads(line)["fact"]).replace(
+                '，', '').replace(' ', ''))
+            meta = json.loads(line)["meta"]
+            contents.append(json.dumps({"fact":temp,"meta":meta}))
+    with open(file=val_dir+'_split.json',mode='w') as output_file:
+        for _, content in enumerate(contents):
+            output_file.write(content+'/n')
 
 def to_words(content, words):
     return ' '.join(words[x] for x in content)
