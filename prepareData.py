@@ -125,7 +125,7 @@ def get_data_with_vocab(data_dir, words_to_id, cat_to_id, config, target_case='t
             data_id.append(sentence_pad)
         else:
             data_id.append([words_to_id[x]
-            for x in jieba.cut(contents[i]) if x in words_to_id])
+                            for x in jieba.cut(contents[i]) if x in words_to_id])
         if target_case != 'term_of_imprisonment':
             label_id.append(cat_to_id[labels[i]])
         else:
@@ -136,19 +136,21 @@ def get_data_with_vocab(data_dir, words_to_id, cat_to_id, config, target_case='t
     y_data = keras.utils.to_categorical(label_id, num_classes=303)
     return x_data, y_data
 
+
 def split_data(train_dir, val_dir, test_dir):
     import jieba
     import json
-    contents=[]
-    with open(file=val_dir+'.json',mode='r') as input_file:
+    contents = []
+    with open(file=val_dir+'.json', mode='r') as input_file:
         for line in input_file.readlines():
-            temp=jieba.cut(str(json.loads(line)["fact"]).replace(
+            temp = jieba.cut(str(json.loads(line)["fact"]).replace(
                 '，', '').replace(' ', ''))
             meta = json.loads(line)["meta"]
-            contents.append(json.dumps({"fact":temp,"meta":meta}))
-    with open(file=val_dir+'_split.json',mode='w') as output_file:
+            contents.append(json.dumps({"fact": temp, "meta": meta}))
+    with open(file=val_dir+'_split.json', mode='w') as output_file:
         for _, content in enumerate(contents):
             output_file.write(content+'/n')
+
 
 def to_words(content, words):
     return ' '.join(words[x] for x in content)
@@ -194,9 +196,9 @@ def balance_data(base_dir):
 
 
 def main():
-    split_data('./good/data_train','./good/data_valid','./data_test')
-    #build_vocab('./good/data_train.json', './good/data_valid.json', './good/data_test.json',
-                './good/vocab.txt', vocab_size=7000, min_frequence=-1, split=False)
+    split_data('./good/data_train', './good/data_valid', './data_test')
+    # build_vocab('./good/data_train.json', './good/data_valid.json', './good/data_test.json',
+    # './good/vocab.txt', vocab_size=7000, min_frequence=-1, split=False)
 
 
 if __name__ == '__main__':
