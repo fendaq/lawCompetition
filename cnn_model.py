@@ -10,13 +10,13 @@ class TCNNConfig(object):
     num_classes = 303  # 类别数
     num_filters = 256  # 卷积核数目
     filter_size = [2, 3, 4, 5]  # 卷积核尺寸
-    vocab_size = 4896  # 词汇表大小
+    vocab_size = 100000  # 词汇表大小
     vocab_init = True
     hidden_dim = 1024  # 全连接层神经元
     hierachy_init = False
     learning_rate = 1e-4  # 学习率
 
-    batch_size = 128  # 每批训练大小
+    batch_size = 64  # 每批训练大小
     num_epochs = 10000  # 总迭代轮次
     kernel_size = 5
     print_per_batch = 100  # 每多少轮输出一次结果

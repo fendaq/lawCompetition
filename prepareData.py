@@ -110,6 +110,7 @@ def batch_iter(x, y, batch_size, shuffle=True):
 
 def get_data_with_vocab(data_dir, words_to_id, cat_to_id, config, target_case='term_of_imprisonment'):
     import keras
+    import jieba
     print("get data from {0}...".format(data_dir))
     contents, labels = read_data(data_dir, target_case)
     data_id, label_id = [], []
@@ -125,7 +126,7 @@ def get_data_with_vocab(data_dir, words_to_id, cat_to_id, config, target_case='t
             data_id.append(sentence_pad)
         else:
             data_id.append([words_to_id[x]
-                            for x in contents[i] if x in words_to_id])
+                            for x in jieba.cut(contents[i]) if x in words_to_id])
         if target_case != 'term_of_imprisonment':
             label_id.append(cat_to_id[labels[i]])
         else:
@@ -182,7 +183,7 @@ def balance_data(base_dir):
 
 def main():
     build_vocab('./good/data_train.json', './good/data_valid.json', './good/data_test.json',
-                './good/vocab.txt', vocab_size=7000, min_frequence=-1, split=True)
+                './good/vocab.txt', vocab_size=7000, min_frequence=-1, split=False)
 
 
 if __name__ == '__main__':
