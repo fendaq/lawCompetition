@@ -5,7 +5,7 @@ def read_data(file_name, target_case="term_of_imprisonment"):
     with open(file=file_name, mode='r', encoding='utf8') as f:
         for line in f:
             content = str(json.loads(line)["fact"]).replace(
-                '，', '').replace(' ', '')
+                '，', '')
             label = json.loads(line)["meta"][target_case]
             if target_case == "term_of_imprisonment":
                 if label["death_penalty"]:
@@ -125,7 +125,7 @@ def get_data_with_vocab(data_dir, words_to_id, cat_to_id, config, target_case='t
             data_id.append(sentence_pad)
         else:
             data_id.append([words_to_id[x]
-                            for x in jieba.cut(contents[i]) if x in words_to_id])
+                            for x in contents[i] if x in words_to_id])
         if target_case != 'term_of_imprisonment':
             label_id.append(cat_to_id[labels[i]])
         else:
@@ -141,42 +141,45 @@ def split_data(train_dir, val_dir, test_dir):
     import jieba
     import json
     contents = []
-    with open(file=val_dir+'.json', mode='r',encoding='utf8') as input_file:
-        index=1
+    with open(file=val_dir+'.json', mode='r', encoding='utf8') as input_file:
+        index = 1
         for line in input_file.readlines():
-            index+=1
-            temp=str(json.loads(line)["fact"]).replace(
+            index += 1
+            temp = str(json.loads(line)["fact"]).replace(
                 '，', '').replace(' ', '')
             temp = ' '.join(jieba.cut(temp))
             meta = json.loads(line)["meta"]
-            contents.append(str({"fact": temp, "meta": meta}).replace('\'','\"').replace('False','false').replace('True','true')+'\n')
-    with open(file=val_dir+'_split.json', mode='w',encoding='utf8') as output_file:
+            contents.append(str({"fact": temp, "meta": meta}).replace(
+                '\'', '\"').replace('False', 'false').replace('True', 'true')+'\n')
+    with open(file=val_dir+'_split.json', mode='w', encoding='utf8') as output_file:
         for _, content in enumerate(contents):
             output_file.write(content)
-   
-    with open(file=test_dir+'.json', mode='r',encoding='utf8') as input_file:
-        index=1
+    contents = []
+    with open(file=test_dir+'.json', mode='r', encoding='utf8') as input_file:
+        index = 1
         for line in input_file.readlines():
-            index+=1
-            temp=str(json.loads(line)["fact"]).replace(
+            index += 1
+            temp = str(json.loads(line)["fact"]).replace(
                 '，', '').replace(' ', '')
             temp = ' '.join(jieba.cut(temp))
             meta = json.loads(line)["meta"]
-            contents.append(str({"fact": temp, "meta": meta}).replace('\'','\"').replace('False','false').replace('True','true')+'\n')
-    with open(file=test_dir+'_split.json', mode='w',encoding='utf8') as output_file:
+            contents.append(str({"fact": temp, "meta": meta}).replace(
+                '\'', '\"').replace('False', 'false').replace('True', 'true')+'\n')
+    with open(file=test_dir+'_split.json', mode='w', encoding='utf8') as output_file:
         for _, content in enumerate(contents):
             output_file.write(content)
-
-    with open(file=train_dir+'.json', mode='r',encoding='utf8') as input_file:
-        index=1
+    contents = []
+    with open(file=train_dir+'.json', mode='r', encoding='utf8') as input_file:
+        index = 1
         for line in input_file.readlines():
-            index+=1
-            temp=str(json.loads(line)["fact"]).replace(
+            index += 1
+            temp = str(json.loads(line)["fact"]).replace(
                 '，', '').replace(' ', '')
             temp = ' '.join(jieba.cut(temp))
             meta = json.loads(line)["meta"]
-            contents.append(str({"fact": temp, "meta": meta}).replace('\'','\"').replace('False','false').replace('True','true')+'\n')
-    with open(file=train_dir+'_split.json', mode='w',encoding='utf8') as output_file:
+            contents.append(str({"fact": temp, "meta": meta}).replace(
+                '\'', '\"').replace('False', 'false').replace('True', 'true')+'\n')
+    with open(file=train_dir+'_split.json', mode='w', encoding='utf8') as output_file:
         for _, content in enumerate(contents):
             output_file.write(content)
     print('success')
@@ -226,7 +229,7 @@ def balance_data(base_dir):
 
 
 def main():
-    split_data('./good/data_train', './good/data_valid', './data_test')
+    split_data('./good/data_train', './good/data_valid', './good/data_test')
     # build_vocab('./good/data_train.json', './good/data_valid.json', './good/data_test.json',
     # './good/vocab.txt', vocab_size=7000, min_frequence=-1, split=False)
 
